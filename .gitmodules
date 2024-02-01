@@ -1,0 +1,3 @@
+[submodule "funcutils"]
+	path = funcutils
+	url = https://github.com/thehans/funcutils.git
