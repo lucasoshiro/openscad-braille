@@ -1,5 +1,11 @@
 include <funcutils/funcutils.scad>
 
+$fn = 30;
+
+input_text = "Hello world";
+padding = 2;
+r = 1;
+
 function all(s, predicate) = fold(true, s, function(a, b) a && predicate(b));
 
 function is_numeric(s) = all(s, function(c) ord(c) >= ord("0") && ord(c) <= ord("9"));
@@ -25,6 +31,11 @@ function str_to_braille(s) = fold(
     ],
     function(a, b) concat(a, b));
     
+
+function braille_dimensions(s) = [
+    (len(str_to_braille(s)) - 2) * CELL_DISTANCE + DOT_DIAMETER + DOT_DISTANCE,
+    2 * DOT_DISTANCE + DOT_DIAMETER
+    ];
 
 module braille_dot(dot, 2d=false, $fn=$fn) {
     if (dot) {
@@ -53,7 +64,7 @@ module braille(s, $fn=$fn, 2d=false) {
 
             translate(
                 [
-                    i * CELL_DISTANCE + k * DOT_DISTANCE,
+                    i * CELL_DISTANCE + k * DOT_DISTANCE + DOT_DIAMETER / 2,
                     (2 - j) * DOT_DISTANCE + DOT_DIAMETER / 2,
                     0
                     ]) {
@@ -214,3 +225,19 @@ BRAILLE_CHARS = [
     undef,
     undef
     ];
+
+union() {
+    dimensions = braille_dimensions(input_text) + 2 * padding * [1, 1];
+
+    translate([r, r, 0])
+    hull() {
+        cylinder(r=1);
+        translate([dimensions.x - 2*r, 0, 0]) cylinder(r=1);
+        translate([0, dimensions.y - 2*r, 0]) cylinder(r=1);
+        translate([dimensions.x - 2*r, dimensions.y - 2*r, 0]) cylinder(r=1);
+    }
+
+    translate([padding, padding, 1]) {
+        braille(input_text);
+    }
+}
