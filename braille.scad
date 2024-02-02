@@ -1,17 +1,19 @@
 $fn = 30;
 
 input_text = "Hello world";
-generate_plate = true;
+generate_plate = "yes";
 padding = 2;
 r = 1;
 
-function char_is_number(c) = ord(c) >= ord("0") && ord(c) <= ord("9");
+function char_is_number(c) = ord_(c) >= ord_("0") && ord_(c) <= ord_("9");
 
-function char_is_uppercase(c) = ord(c) >= ord("A") && ord(c) <= ord("Z");
+function char_is_uppercase(c) = ord_(c) >= ord_("A") && ord_(c) <= ord_("Z");
 
 function is_numeric(s, i=0) = i == len(s) ? true : char_is_number(s[i]) && is_numeric(s, i+1);
 
 function is_uppercase(s, i=0) = i == len(s) ? true : char_is_uppercase(s[i]) && is_uppercase(s, i+1);
+ 
+function ord_(c) = version().x >= 2019 ? ord_(c) : workaroud_ord(c);
 
 function get_braille_prefix(word) =
     len(word) == 0        ? []                        :
@@ -20,9 +22,9 @@ function get_braille_prefix(word) =
     is_uppercase(word)    ? BRAILLE_UPPERCASE_PREFIX  :
     [];
 
-function get_braille_char(c) = BRAILLE_CHARS[ord(c)];
+function get_braille_char(c) = BRAILLE_CHARS[ord_(c)];
 
-function word_to_braille(word) = [for (c = word) get_braille_char(c)];
+function word_to_braille(word) = [for (c = str_to_vector(word)) get_braille_char(c)];
 
 function append_to_braille(braille, word) = concat(
     braille,
@@ -74,6 +76,8 @@ module braille_dot(dot, 2d=false, $fn=$fn) {
 module braille(s, $fn=$fn, 2d=false) {
     braille = str_to_braille(s);
 
+    echo(braille);
+
     if (len(braille) > 0) {
         for (
             i = [0:(len(braille) - 1)],
@@ -82,23 +86,88 @@ module braille(s, $fn=$fn, 2d=false) {
             ) {
             matrix = braille[i];
 
-            translate(
+            #translate(
                 [
                     i * CELL_DISTANCE + k * DOT_DISTANCE + DOT_DIAMETER / 2,
                     (2 - j) * DOT_DISTANCE + DOT_DIAMETER / 2,
                     0
                     ]) {
-
                 braille_dot(matrix[j][k], $fn=$fn, 2d=2d);
             }
         }
     }
 }
 
+function str_to_vector(s) = [for (i=[0:(len(s)-1)]) s[i]];
+
+function workaroud_ord(c) =
+    c == "0" ? 48 :
+    c == "1" ? 49 :
+    c == "2" ? 50 :
+    c == "3" ? 51 :
+    c == "4" ? 52 :
+    c == "5" ? 53 :
+    c == "6" ? 54 :
+    c == "7" ? 55 :
+    c == "8" ? 56 :
+    c == "9" ? 57 :
+    c == "a" ? 97 :
+    c == "b" ? 98 :
+    c == "c" ? 99 :
+    c == "d" ? 100 :
+    c == "e" ? 101 :
+    c == "f" ? 102 :
+    c == "g" ? 103 :
+    c == "h" ? 104 :
+    c == "i" ? 105 :
+    c == "j" ? 106 :
+    c == "k" ? 107 :
+    c == "l" ? 108 :
+    c == "m" ? 109 :
+    c == "n" ? 110 :
+    c == "o" ? 111 :
+    c == "p" ? 112 :
+    c == "q" ? 113 :
+    c == "r" ? 114 :
+    c == "s" ? 115 :
+    c == "t" ? 116 :
+    c == "u" ? 117 :
+    c == "v" ? 118 :
+    c == "w" ? 119 :
+    c == "x" ? 120 :
+    c == "y" ? 121 :
+    c == "z" ? 122 :
+    c == "A" ? 65 :
+    c == "B" ? 66 :
+    c == "C" ? 67 :
+    c == "D" ? 68 :
+    c == "E" ? 69 :
+    c == "F" ? 70 :
+    c == "G" ? 71 :
+    c == "H" ? 72 :
+    c == "I" ? 73 :
+    c == "J" ? 74 :
+    c == "K" ? 75 :
+    c == "L" ? 76 :
+    c == "M" ? 77 :
+    c == "N" ? 78 :
+    c == "O" ? 79 :
+    c == "P" ? 80 :
+    c == "Q" ? 81 :
+    c == "R" ? 82 :
+    c == "S" ? 83 :
+    c == "T" ? 84 :
+    c == "U" ? 85 :
+    c == "V" ? 86 :
+    c == "W" ? 87 :
+    c == "X" ? 88 :
+    c == "Y" ? 89 :
+    c == "Z" ? 90 :
+    undef;
+
 DOT_DIAMETER = 1.5;
 DOT_DISTANCE = 2.4;
 CELL_DISTANCE = 6;
-
 
 BRAILLE_NUMBER_PREFIX = [
     [[false, true], [false, true], [true, true]]
@@ -246,7 +315,8 @@ BRAILLE_CHARS = [
     undef
     ];
 
-if (generate_plate) {
+
+if (generate_plate == "yes") {
     union() {
         dimensions = braille_dimensions(input_text) + 2 * padding * [1, 1];
 
@@ -267,4 +337,7 @@ else {
     braille(input_text);
 }
 
-/* echo(split_words("um dois tres quatro")); */
+/* braille("oi"); */
+/* echo(word_to_braille("oi")); */
+/* echo(get_braille_char("o")); */
+/* echo([for (c = str_to_vector("oi")) get_braille_char(c)]); */
