@@ -250,8 +250,7 @@ if (generate_plate) {
     union() {
         dimensions = braille_dimensions(input_text) + 2 * padding * [1, 1];
 
-        translate([r, r, 0])
-            hull() {
+        color("white") translate([r, r, 0]) hull() {
             cylinder(r=1);
             translate([dimensions.x - 2*r, 0, 0]) cylinder(r=1);
             translate([0, dimensions.y - 2*r, 0]) cylinder(r=1);
@@ -259,7 +258,7 @@ if (generate_plate) {
         }
 
         translate([padding, padding, 1]) {
-            braille(input_text);
+            color("black") braille(input_text);
         }
     }
 }
