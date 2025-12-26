@@ -12,8 +12,8 @@ function char_is_uppercase(c) = ord_(c) >= ord_("A") && ord_(c) <= ord_("Z");
 function is_numeric(s, i=0) = i == len(s) ? true : char_is_number(s[i]) && is_numeric(s, i+1);
 
 function is_uppercase(s, i=0) = i == len(s) ? true : char_is_uppercase(s[i]) && is_uppercase(s, i+1);
- 
-function ord_(c) = version().x >= 2019 ? ord_(c) : workaroud_ord(c);
+
+function ord_(c) = version().x >= 2019 ? ord(c) : workaroud_ord(c);
 
 function get_braille_prefix(word) =
     len(word) == 0        ? []                        :
@@ -86,7 +86,7 @@ module braille(s, $fn=$fn, 2d=false) {
             ) {
             matrix = braille[i];
 
-            #translate(
+            translate(
                 [
                     i * CELL_DISTANCE + k * DOT_DISTANCE + DOT_DIAMETER / 2,
                     (2 - j) * DOT_DISTANCE + DOT_DIAMETER / 2,
@@ -315,13 +315,11 @@ BRAILLE_CHARS = [
     undef
     ];
 
-
 if (generate_plate == "yes") {
     union() {
         dimensions = braille_dimensions(input_text) + 2 * padding * [1, 1];
 
-        translate([r, r, 0])
-            hull() {
+        color("white") translate([r, r, 0]) hull() {
             cylinder(r=1);
             translate([dimensions.x - 2*r, 0, 0]) cylinder(r=1);
             translate([0, dimensions.y - 2*r, 0]) cylinder(r=1);
@@ -329,7 +327,7 @@ if (generate_plate == "yes") {
         }
 
         translate([padding, padding, 1]) {
-            braille(input_text);
+            color("black") braille(input_text);
         }
     }
 }
@@ -337,7 +335,3 @@ else {
     braille(input_text);
 }
 
-/* braille("oi"); */
-/* echo(word_to_braille("oi")); */
-/* echo(get_braille_char("o")); */
-/* echo([for (c = str_to_vector("oi")) get_braille_char(c)]); */
