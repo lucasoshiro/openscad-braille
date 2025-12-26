@@ -2,6 +2,7 @@ $fn = 30;
 
 input_text = "Hello world";
 generate_plate = "yes";
+dot_shape="flat_top";
 padding = 2;
 r = 1;
 
@@ -59,21 +60,29 @@ function braille_dimensions(s) = [
     2 * DOT_DISTANCE + DOT_DIAMETER
     ];
 
-module braille_dot(dot, 2d=false, $fn=$fn) {
+module braille_dot(dot, 2d=false, $fn=$fn, shape="sphere") {
+    module dot_shape() {
+        if (shape == "flat_top") {
+            scale([1, 1, 1.2]) sphere(d=DOT_DIAMETER, $fn=$fn);
+        }
+        else sphere(d=DOT_DIAMETER, $fn=$fn);
+    }
+
     if (dot) {
         if (2d) {
             circle(d=DOT_DIAMETER, $fn=$fn);
         }
         else {
             intersection() {
-                sphere(d=DOT_DIAMETER, $fn=$fn);
-                translate([-5, -5, 0]) cube(10);
+                dot_shape();
+                translate(-1 * [1, 1, 0] * DOT_DIAMETER)
+                    cube([2, 2, 0.5] * DOT_DIAMETER);
             }
         }
     }
 }
 
-module braille(s, $fn=$fn, 2d=false) {
+module braille(s, $fn=$fn, 2d=false, shape="sphere") {
     braille = str_to_braille(s);
 
     echo(braille);
@@ -92,7 +101,8 @@ module braille(s, $fn=$fn, 2d=false) {
                     (2 - j) * DOT_DISTANCE + DOT_DIAMETER / 2,
                     0
                     ]) {
-                braille_dot(matrix[j][k], $fn=$fn, 2d=2d);
+
+                braille_dot(matrix[j][k], $fn=$fn, 2d=2d, shape=shape);
             }
         }
     }
@@ -327,11 +337,10 @@ if (generate_plate == "yes") {
         }
 
         translate([padding, padding, 1]) {
-            color("black") braille(input_text);
+            color("black") braille(input_text, shape=dot_shape);
         }
     }
 }
 else {
     braille(input_text);
 }
-

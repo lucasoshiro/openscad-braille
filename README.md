@@ -17,6 +17,8 @@ braille("Hello world"); // generates a 3D braille with the default $fn
 
 braille("Hello world", $fn=60); // generates a 3D braille with $fn = 60
 
+braille("Hello world", shape="flat_top"); // flatten the top, better suited for FDM
+
 braille("Hello world"); // generates a 2D braille
 ~~~
 
